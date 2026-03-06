@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AgentGuard Settings</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+    :root {
+      --orange: #FF5500; --black: #0A0A0A; --dark: #111;
+      --text: #FF5500; --text-dim: #993300; --border-dim: #662200;
+      --green: #00FF66; --red: #FF2222;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--black); color: var(--text);
+      font-family: 'Share Tech Mono', monospace; font-size: 12px;
+      min-height: 100vh; padding: 20px;
+    }
+    .header {
+      background: var(--orange); color: var(--black);
+      padding: 10px 20px; margin-bottom: 20px;
+      font-family: 'VT323', monospace; font-size: 28px; letter-spacing: 4px;
+    }
+    .section {
+      border: 1px solid var(--border-dim); margin-bottom: 16px; max-width: 600px;
+    }
+    .section-hdr {
+      background: var(--dark); border-bottom: 1px solid var(--border-dim);
+      padding: 6px 12px; font-size: 10px; letter-spacing: 2px; color: var(--text-dim);
+    }
+    .section-body { padding: 12px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 10px; color: var(--text-dim); margin-bottom: 4px; letter-spacing: 1px; }
+    .field input[type="text"], .field input[type="password"], .field select {
+      width: 100%; background: #0d0d0d; border: 1px solid var(--border-dim);
+      color: #FF8844; font-family: 'Share Tech Mono', monospace; font-size: 12px;
+      padding: 6px 8px; outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--orange); }
+    .field select option { background: var(--black); }
+    .field input[type="range"] { width: 100%; accent-color: var(--orange); }
+    .field .range-row { display: flex; gap: 8px; align-items: center; }
+    .field .range-val { color: var(--orange); min-width: 30px; }
+    .checkbox-row { display: flex; align-items: center; gap: 8px; }
+    .checkbox-row input[type="checkbox"] { accent-color: var(--orange); width: 14px; height: 14px; }
+    .save-btn {
+      background: var(--black); color: var(--orange);
+      border: 2px solid var(--orange); font-family: 'VT323', monospace;
+      font-size: 20px; letter-spacing: 3px; padding: 8px 24px; cursor: pointer;
+    }
+    .save-btn:hover { background: var(--orange); color: var(--black); }
+    .msg { margin-top: 8px; font-size: 11px; display: none; }
+    .msg.ok { color: var(--green); display: block; }
+    .msg.err { color: var(--red); display: block; }
+  </style>
+</head>
+<body>
+<div class="header">AGENTGUARD — SETTINGS</div>
+
+<div class="section">
+  <div class="section-hdr">// LLM PROVIDER</div>
+  <div class="section-body">
+    <div class="field">
+      <label>PROVIDER</label>
+      <select id="provider">
+        <option value="anthropic">Anthropic (Claude)</option>
+        <option value="openai">OpenAI (GPT)</option>
+        <option value="gemini">Google (Gemini)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>API KEY</label>
+      <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" />
+    </div>
+    <div class="field">
+      <label>MODEL</label>
+      <select id="model">
+        <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
+        <option value="claude-opus-4-6">claude-opus-4-6</option>
+        <option value="claude-haiku-4-5-20251001">claude-haiku-4-5</option>
+        <option value="gpt-4o">gpt-4o</option>
+        <option value="gpt-4o-mini">gpt-4o-mini</option>
+        <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+        <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-hdr">// AGENT PARAMETERS</div>
+  <div class="section-body">
+    <div class="field">
+      <label>MAX STEPS</label>
+      <div class="range-row">
+        <input type="range" id="maxSteps" min="5" max="100" value="30" />
+        <span class="range-val" id="maxStepsVal">30</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>VISION MODE</label>
+      <div class="checkbox-row">
+        <input type="checkbox" id="useVision" />
+        <span style="color:var(--text-dim);font-size:11px">Enable screenshot analysis (requires vision-capable model)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-hdr">// SECURITY SETTINGS</div>
+  <div class="section-body">
+    <div class="field">
+      <label>PROMPT INJECTION GUARD</label>
+      <div class="checkbox-row">
+        <input type="checkbox" id="guardEnabled" checked />
+        <span style="color:var(--text-dim);font-size:11px">Filter malicious content from web pages</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>AUTO-SCAN ON NAVIGATE</label>
+      <div class="checkbox-row">
+        <input type="checkbox" id="autoScan" />
+        <span style="color:var(--text-dim);font-size:11px">Automatically scan pages for threats</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="save-btn" id="save-btn">SAVE SETTINGS</button>
+<div class="msg" id="save-msg"></div>
+
+<script>
+  const fields = ['provider', 'apiKey', 'model', 'maxSteps', 'useVision', 'guardEnabled', 'autoScan'];
+
+  function loadSettings() {
+    chrome.storage.local.get(['agentguard_settings'], r => {
+      const s = r.agentguard_settings || {};
+      if (s.provider) document.getElementById('provider').value = s.provider;
+      if (s.apiKey) document.getElementById('apiKey').value = s.apiKey;
+      if (s.model) document.getElementById('model').value = s.model;
+      if (s.maxSteps) {
+        document.getElementById('maxSteps').value = s.maxSteps;
+        document.getElementById('maxStepsVal').textContent = s.maxSteps;
+      }
+      if (s.useVision) document.getElementById('useVision').checked = s.useVision;
+      if (s.guardEnabled !== undefined) document.getElementById('guardEnabled').checked = s.guardEnabled;
+      if (s.autoScan) document.getElementById('autoScan').checked = s.autoScan;
+    });
+  }
+
+  document.getElementById('maxSteps').addEventListener('input', e => {
+    document.getElementById('maxStepsVal').textContent = e.target.value;
+  });
+
+  document.getElementById('save-btn').addEventListener('click', () => {
+    const settings = {
+      provider: document.getElementById('provider').value,
+      apiKey: document.getElementById('apiKey').value,
+      model: document.getElementById('model').value,
+      maxSteps: parseInt(document.getElementById('maxSteps').value),
+      useVision: document.getElementById('useVision').checked,
+      guardEnabled: document.getElementById('guardEnabled').checked,
+      autoScan: document.getElementById('autoScan').checked,
+    };
+    chrome.storage.local.set({ agentguard_settings: settings }, () => {
+      const msg = document.getElementById('save-msg');
+      msg.textContent = '✓ Settings saved';
+      msg.className = 'msg ok';
+      setTimeout(() => msg.className = 'msg', 3000);
+    });
+  });
+
+  loadSettings();
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "AgentGuard",
+  "version": "1.0.0",
+  "description": "Cyber-Aware Agentic AI for Safe Web Automation",
+  "permissions": [
+    "storage",
+    "scripting",
+    "tabs",
+    "activeTab",
+    "unlimitedStorage"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_icon": {
+      "32": "icons/icon-32.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "AgentGuard"
+  },
+  "options_page": "options/index.html",
+  "icons": {
+    "32": "icons/icon-32.png",
+    "128": "icons/icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["popup/*", "options/*", "icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
